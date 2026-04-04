@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+__pycache__/
+*.pyc
+.venv/
+.uv/
+
+# Build output
+dist/
+build/
+*.js.map
+*.d.ts.map
+
+# Environment / secrets — NEVER commit these
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Claude Code — commit project config, exclude personal + runtime state
+.claude/todos/
+.claude/debug/
+.claude/shell-snapshots/
+.claude/sessions/
+.claude/memory/session-log.md   # auto-generated per session — exclude from shared repo
+
+# Keep these (they're the reference project content):
+# .claude/settings.json
+# .claude/rules/
+# .claude/skills/
+# .claude/agents/
+# .claude/hooks/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.swp

@@ -1,0 +1,85 @@
+{
+  "// CAPABILITY: HOOKS + MCP": "This file configures both lifecycle hooks and MCP server connections. Hooks are shell commands that fire on Claude Code events. MCP servers extend Claude with external tools.",
+
+  "mcpServers": {
+    "nexus-platform": {
+      "// description": "Custom MCP server — the main educational artifact. Shows how to build your own MCP server. See mcp-servers/nexus-platform/",
+      "type": "stdio",
+      "command": "node",
+      "args": ["./mcp-servers/nexus-platform/dist/index.js"],
+      "env": {
+        "NEXUS_API_URL": "http://localhost:3001",
+        "NEXUS_API_KEY": "${NEXUS_API_KEY}"
+      }
+    },
+    "github": {
+      "// description": "Official GitHub MCP server. Provides PR creation, issue management, code review tools.",
+      "// install": "npx @modelcontextprotocol/server-github",
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+    "postgres": {
+      "// description": "Official Postgres MCP server. Allows Claude to query workflow state and service databases directly.",
+      "// install": "npx @modelcontextprotocol/server-postgres",
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "${DATABASE_URL}"]
+    }
+  },
+
+  "hooks": {
+    "// CAPABILITY: HOOKS": "Hooks fire on Claude Code lifecycle events. Each hook is a shell command. See .claude/hooks/ for the scripts.",
+
+    "PreToolUse": [
+      {
+        "// purpose": "Block dangerous shell commands before they run. Stops rm -rf, kubectl delete on prod, DROP TABLE, etc.",
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/pre-tool-use-bash.sh"
+          }
+        ]
+      }
+    ],
+
+    "PostToolUse": [
+      {
+        "// purpose": "Auto-lint and typecheck edited files. Keeps code quality without manual intervention.",
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/post-tool-use-edit.sh"
+          }
+        ]
+      },
+      {
+        "// purpose": "When a Bash command exits with a non-zero code that looks like a test run, trigger the debug agent.",
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/post-test-fail.sh"
+          }
+        ]
+      }
+    ],
+
+    "Stop": [
+      {
+        "// purpose": "On session end, summarize architectural decisions made and write them to session memory log.",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/stop-save-memory.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
