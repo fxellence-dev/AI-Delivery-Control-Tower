@@ -1,0 +1,34 @@
+{
+  "name": "engineering-governance",
+  "version": "1.0.0",
+  "description": "Engineering governance capabilities for Claude Code — ADR writing, contract tests, OpenAPI review, and architectural oversight. Install this plugin on any Nexus Platform service repo.",
+  "author": "Nexus Platform Team",
+
+  "capabilities": {
+    "skills": [
+      "write-adr",
+      "generate-acceptance-criteria",
+      "create-contract-tests",
+      "review-openapi-breaking-change",
+      "design-sequence-diagram"
+    ],
+    "agents": [
+      "architect",
+      "test-engineer"
+    ],
+    "rules": []
+  },
+
+  "install": {
+    "copySkillsTo": ".claude/skills/",
+    "copyAgentsTo": ".claude/agents/",
+    "copyRulesTo": ".claude/rules/"
+  },
+
+  "usageExamples": [
+    "Use the architect agent to review a cross-service change",
+    "/write-adr to document a new architecture decision",
+    "/create-contract-tests after changing a service API",
+    "/review-openapi-breaking-change before merging an API change"
+  ]
+}

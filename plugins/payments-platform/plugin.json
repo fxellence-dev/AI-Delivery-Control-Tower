@@ -1,0 +1,38 @@
+{
+  "name": "payments-platform",
+  "version": "1.0.0",
+  "description": "PCI-DSS compliance and payment security capabilities. Bundles payment risk review skill, PCI-DSS coding rules, and security reviewer agent. Required on any repo handling payment data.",
+  "author": "Nexus Platform Payments Team",
+
+  "capabilities": {
+    "skills": [
+      "payments-risk-review",
+      "build-postmortem"
+    ],
+    "agents": [
+      "security-reviewer"
+    ],
+    "rules": [
+      "payments"
+    ]
+  },
+
+  "install": {
+    "copySkillsTo": ".claude/skills/",
+    "copyAgentsTo": ".claude/agents/",
+    "copyRulesTo": ".claude/rules/"
+  },
+
+  "requirements": {
+    "minimumClaudeCodeVersion": "1.0.0",
+    "requiredEnvironmentVariables": []
+  },
+
+  "usageExamples": [
+    "Use the security-reviewer agent before merging any payment-service change",
+    "/payments-risk-review to run a full PCI-DSS compliance check",
+    "/build-postmortem after any payment-related incident"
+  ],
+
+  "complianceNote": "Installing this plugin does not guarantee PCI-DSS compliance. It provides automated checks and guidance. Human security review is still required for audit certification."
+}
