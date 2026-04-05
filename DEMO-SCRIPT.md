@@ -31,7 +31,16 @@ Have two windows visible:
 
 > "Before I show you what this does, I want to show you what happens without it."
 
-Open a **fresh** Claude session (new tab or `claude --no-context`). Paste:
+Open a **fresh** Claude session with no project context. The simplest way:
+
+```bash
+# Option A: Run claude from a temp directory (no CLAUDE.md loaded)
+cd /tmp && claude
+```
+
+Or if you want to stay in one terminal window, open Claude Code in `adct/` and run `/clear` to wipe the conversation, then immediately paste before Claude re-reads context. But Option A is cleaner for demos.
+
+Paste:
 
 ```
 Add a new payment entity to the payment service
