@@ -40,18 +40,26 @@ cd /tmp && claude
 
 Or if you want to stay in one terminal window, open Claude Code in `adct/` and run `/clear` to wipe the conversation, then immediately paste before Claude re-reads context. But Option A is cleaner for demos.
 
-Paste:
+**Important**: Do NOT ask Claude to modify the existing payment-service — it will read the existing code and copy the good patterns, killing the contrast. Ask it to build something new from scratch.
+
+Paste this:
 
 ```
-Add a new payment entity to the payment service
+Write a TypeScript payment processing service from scratch.
+Include a Payment entity, a POST /payments endpoint, and a POST /payments/:id/refunds endpoint.
 ```
 
 Watch it output code. Point out:
-- It probably used UUID, not ULID
-- It probably threw exceptions instead of using Result types
-- It has no idea what your audit trail requirements are
-- It doesn't know what team owns this service
-- It has no idea you can't deploy on Fridays
+- It used `uuid()` or `crypto.randomUUID()` — not ULID
+- It used `throw new Error(...)` — not Result types
+- No audit log anywhere
+- No idempotency key handling
+- `console.log` instead of structured logging
+- No PCI-DSS considerations
+
+Then say: "Now let's run the exact same prompt in our project where Claude has memory loaded."
+
+Switch to the `adct/` terminal and paste the **same prompt**. The output will be completely different.
 
 **Say:**
 > "This is the 'magic demo' problem. It looks impressive. But if I let this run on our actual codebase, it would produce code that fails our code review. Every. Single. Time.
