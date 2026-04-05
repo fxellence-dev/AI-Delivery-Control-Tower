@@ -25,48 +25,121 @@ Have two windows visible:
 
 ---
 
-## Part 1: The Problem (5 min) — No code yet
+## Part 1: The Problem (5 min) — No live coding
 
-**Say this:**
-
-> "Before I show you what this does, I want to show you what happens without it."
-
-Open a **fresh** Claude session with no project context. The simplest way:
-
-```bash
-# Option A: Run claude from a temp directory (no CLAUDE.md loaded)
-cd /tmp && claude
-```
-
-Or if you want to stay in one terminal window, open Claude Code in `adct/` and run `/clear` to wipe the conversation, then immediately paste before Claude re-reads context. But Option A is cleaner for demos.
-
-**Important**: Do NOT ask Claude to modify the existing payment-service — it will read the existing code and copy the good patterns, killing the contrast. Ask it to build something new from scratch.
-
-Paste this:
-
-```
-Write a TypeScript payment processing service from scratch.
-Include a Payment entity, a POST /payments endpoint, and a POST /payments/:id/refunds endpoint.
-```
-
-Watch it output code. Point out:
-- It used `uuid()` or `crypto.randomUUID()` — not ULID
-- It used `throw new Error(...)` — not Result types
-- No audit log anywhere
-- No idempotency key handling
-- `console.log` instead of structured logging
-- No PCI-DSS considerations
-
-Then say: "Now let's run the exact same prompt in our project where Claude has memory loaded."
-
-Switch to the `adct/` terminal and paste the **same prompt**. The output will be completely different.
+> ⚠️ **DO NOT run this live.** Claude will find the existing code on your filesystem and copy its patterns, killing the contrast. Use the pre-written example below — it's embedded right here, no other file to open.
 
 **Say:**
-> "This is the 'magic demo' problem. It looks impressive. But if I let this run on our actual codebase, it would produce code that fails our code review. Every. Single. Time.
+> "Before I show you what this does, I want to show you what happens without it. This is a real example of what Claude produces when your team has no memory files — no CLAUDE.md, no rules. Generic prompt, no project context."
 
-> The issue isn't Claude's intelligence. It's that Claude has no persistent memory of us. Every session, every developer starts from zero. Some get good results, some don't. There's no standard.
+**Show this code on screen** (paste into a blank editor tab or just scroll through it here):
 
-> Now let me show you what happens when you give Claude a structured understanding of your team."
+```typescript
+// ❌ BEFORE: Claude with no memory of your team
+// Prompt used: "Write a TypeScript payment processing service with a
+// Payment entity, POST /payments, and POST /payments/:id/refunds"
+
+import express, { Request, Response } from 'express';
+import { v4 as uuidv4 } from 'uuid';   // ❌ POINT 1: UUID not ULID
+
+const app = express();
+app.use(express.json());
+
+const payments: Record<string, Payment> = {};  // ❌ no repository layer
+
+interface Payment {
+  id: string;
+  amount: number;
+  currency: string;
+  customerId: string;
+  status: 'pending' | 'succeeded' | 'failed' | 'refunded';
+  createdAt: string;
+}
+
+// POST /payments
+app.post('/payments', async (req: Request, res: Response) => {
+  const { amount, currency, customerId, paymentMethodId } = req.body;
+  // ❌ POINT 2: No idempotency key — retry this endpoint = double charge
+
+  const payment: Payment = {
+    id: uuidv4(),           // ❌ POINT 1: UUID not ULID
+    amount,
+    currency,
+    customerId,
+    status: 'pending',
+    createdAt: new Date().toISOString(),
+  };
+
+  console.log('Creating payment:', payment);  // ❌ POINT 3: console.log not Pino
+  // ❌ POINT 4: No audit log — PCI-DSS requires logging every state transition
+
+  try {
+    payment.status = 'succeeded';
+    payments[payment.id] = payment;
+    res.status(201).json(payment);  // ❌ no standard { data, meta } wrapper
+  } catch (error) {
+    throw new Error('Payment failed');  // ❌ POINT 5: throw not Result type
+  }
+});
+
+// POST /payments/:id/refunds
+app.post('/payments/:id/refunds', async (req: Request, res: Response) => {
+  const payment = payments[req.params.id];
+
+  if (!payment) throw new Error('Payment not found');         // ❌ POINT 5: throw
+  if (payment.status !== 'succeeded') throw new Error('Cannot refund');  // ❌ throw
+
+  const refundAmount = req.body.amount ?? payment.amount;
+  if (refundAmount > payment.amount) throw new Error('Exceeds payment');  // ❌ throw
+  // ❌ POINT 2: No idempotency — retry = multiple refunds
+  // ❌ POINT 4: No audit log on refund
+
+  payment.status = 'refunded';
+  console.log('Refund created');  // ❌ POINT 3: console.log
+  res.json({ refunded: refundAmount });
+});
+
+app.listen(3001, () => console.log('Running'));  // ❌ console.log
+```
+
+**Walk through each marked problem — use these exact words:**
+
+**POINT 1 — UUID vs ULID** (line 3):
+> "First thing — `uuidv4()`. Our standard is ULID — sortable, time-ordered, works better for cursor-based pagination and audit log ordering. This would fail our first code review."
+
+**POINT 2 — No idempotency** (line 24):
+> "No idempotency key check. If a network timeout causes a client to retry this POST, Claude's code charges the customer twice. Our standard is to require an idempotency-key header and deduplicate. Claude has no idea we do this."
+
+**POINT 3 — console.log** (line 31):
+> "console.log. Our standard is Pino — structured JSON logging that goes to Datadog with service name, version, requestId attached automatically. You can't query plain console.log in production."
+
+**POINT 4 — No audit trail** (line 33):
+> "No audit log anywhere. In our payment service, every state transition — create, refund, failure — must be written to the audit table with userId, IP address, requestId. That's a PCI-DSS requirement. This code would be flagged immediately in our security review."
+
+**POINT 5 — throw instead of Result** (line 41):
+> "Every error path throws an exception. We use Result types — neverthrow — so errors are explicit in the return type, not invisible. Any service consuming this breaks our error handling pattern."
+
+**Pause. Then say:**
+> "This code works. It runs. But it violates five of our team's core standards in about 60 lines. If I let this go to production, I'm creating tech debt, compliance risk, and a debugging nightmare.
+
+> This is what every developer on your team gets today when they open Claude with no context. The code looks fine on screen. The problems only show up in code review, in production incidents, or in the next audit.
+
+> Now watch what happens when Claude has our team's memory loaded."
+
+**Open Claude Code in the `adct/` directory and paste:**
+```
+Write a TypeScript payment processing service with a Payment entity,
+POST /payments, and POST /payments/:id/refunds
+```
+
+**As the output appears, call out:**
+- `ulid()` → "ULID. From memory."
+- `neverthrow` → "Result types. From memory."
+- `auditLog.record(...)` → "Audit trail. From the payments rule file."
+- `pino` → "Structured logging. From memory."
+- `idempotency-key` header check → "Idempotency. From memory."
+
+> "Same prompt. Same Claude. Completely different output. The only difference is what's in the `.claude/` folder."
 
 ---
 
