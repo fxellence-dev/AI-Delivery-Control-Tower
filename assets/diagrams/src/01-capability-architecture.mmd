@@ -1,0 +1,26 @@
+graph TD
+    subgraph MEM ["Memory Layer"]
+        CLAUDE["CLAUDE.md<br/>Global rules, workflow, quirks"]
+        RULES[".claude/rules/<br/>typescript · python · payments · k8s"]
+    end
+
+    subgraph AUTO ["Automation Layer"]
+        HOOKS[".claude/hooks/<br/>Safety guards · Auto-lint · Session memory"]
+        SKILLS[".claude/skills/<br/>write-adr · risk-review · release-notes · ..."]
+    end
+
+    subgraph AGT ["Agent Layer"]
+        AGENTS[".claude/agents/<br/>planner · architect · engineer · tester · security · release"]
+    end
+
+    subgraph INT ["Integration Layer"]
+        MCP["MCP Servers<br/>nexus-platform · GitHub · Postgres"]
+        PLUG["Plugins<br/>payments-platform · engineering-governance"]
+    end
+
+    MEM --> AGT
+    MEM --> AUTO
+    AUTO --> AGT
+    SKILLS --> AGT
+    INT --> AGT
+    AGT --> OUT["Consistent · Safe · Documented Output"]

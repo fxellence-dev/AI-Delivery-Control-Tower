@@ -1,0 +1,20 @@
+graph LR
+    W1["Week 1–2<br/>CLAUDE.md<br/>Conventions encoded"]
+    W3["Week 3–4<br/>Skills added<br/>ADRs automated"]
+    W5["Week 5–6<br/>Hooks live<br/>Auto-lint · Safety"]
+    W7["Week 7–8<br/>Agents active<br/>6-step workflow"]
+    M2["Month 2–3<br/>MCP connected<br/>Real system data"]
+    M4["Month 4+<br/>Plugins shared<br/>Org-wide adoption"]
+
+    W1 -->|"fix once, applied always"| W3
+    W3 -->|"ADRs in 30 seconds"| W5
+    W5 -->|"zero CI lint failures"| W7
+    W7 -->|"full workflow automated"| M2
+    M2 -->|"system-aware Claude"| M4
+
+    style W1 fill:#eff6ff,stroke:#3b82f6,color:#1e3a8a
+    style W3 fill:#dbeafe,stroke:#2563eb,color:#1e3a8a
+    style W5 fill:#93c5fd,stroke:#1d4ed8,color:#1e3a8a
+    style W7 fill:#3b82f6,stroke:#1d4ed8,color:#ffffff
+    style M2 fill:#1d4ed8,stroke:#1e3a8a,color:#ffffff
+    style M4 fill:#1e3a8a,stroke:#1e40af,color:#ffffff

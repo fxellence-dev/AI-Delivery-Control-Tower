@@ -129,13 +129,15 @@ app.listen(3001, () => console.log('Running'));  // ❌ console.log
 **Open Claude Code in the `adct/` directory and paste:**
 ```
 Write a TypeScript payment processing service with a Payment entity,
-POST /payments, and POST /payments/:id/refunds
+POST /payments, and POST /payments/:id/refunds. Apply all conventions from memory.
 ```
 
+> ℹ️ The phrase "apply all conventions from memory" tells Claude to actively use what's in CLAUDE.md and .claude/rules/ rather than just starting to code. For this quick Part 1 demo you don't want the full agent workflow — just the memory effect on code quality.
+
 **As the output appears, call out:**
-- `ulid()` → "ULID. From memory."
+- `ulid()` → "ULID. From memory — `.claude/rules/typescript.md`."
 - `neverthrow` → "Result types. From memory."
-- `auditLog.record(...)` → "Audit trail. From the payments rule file."
+- `auditLog.record(...)` → "Audit trail. From `.claude/rules/payments.md` — PCI-DSS requirement."
 - `pino` → "Structured logging. From memory."
 - `idempotency-key` header check → "Idempotency. From memory."
 
@@ -183,13 +185,17 @@ Now open `.claude/rules/payments.md`. Say:
 Paste this into Claude Code:
 
 ```
+Follow the full delivery workflow from CLAUDE.md for this feature request:
+
 Add webhook retry logic to the notification service with exponential backoff 
 and dead-letter queue support. The service currently attempts delivery once 
 and fails permanently on network issues — customers are losing events.
 ```
 
+> ⚠️ **The phrase "follow the full delivery workflow from CLAUDE.md" is critical.** Without it, Claude skips straight to coding and bypasses all agents and skills. With it, Claude reads the workflow section in CLAUDE.md and follows it: planner → architect → backend-engineer → test-engineer → security-reviewer → release-manager.
+
 **Say:**
-> "I'm going to let Claude run. I'll narrate what's happening as we go. Watch the bottom left — you'll see which agent is active."
+> "I'm going to let Claude run. I'll narrate what's happening as we go. Watch — it will announce each specialist agent before it starts that phase of work."
 
 **Don't stop it yet — let it run while you narrate Parts 4-7.**
 

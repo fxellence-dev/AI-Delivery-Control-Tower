@@ -1,0 +1,26 @@
+sequenceDiagram
+    participant Dev as Developer
+    participant C as Claude
+    participant H as Hook Script
+    participant FS as File System
+
+    Dev->>C: "Add webhook retry logic..."
+
+    Note over C,H: Before every bash command
+    C->>H: PreToolUse:Bash → pre-tool-use-bash.sh
+    H-->>C: ✅ Allow  (or ❌ Block if rm -rf / DROP TABLE / kubectl delete prod)
+
+    Note over C,FS: After every file edit
+    C->>FS: Edit delivery_service.py
+    C->>H: PostToolUse:Edit → post-tool-use-edit.sh
+    H->>FS: ruff check --fix + mypy
+    H-->>C: ✅ Lint OK (or errors Claude must fix)
+
+    Note over C,H: After tests fail
+    C->>FS: pytest (exit ≠ 0)
+    C->>H: PostToolUse:Bash → post-test-fail.sh
+    H-->>C: Pipe output to test-debugger subagent
+
+    Note over C,H: When session ends
+    C->>H: Stop → stop-save-memory.sh
+    H->>FS: Append decisions to .claude/memory/session-log.md

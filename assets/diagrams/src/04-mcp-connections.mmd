@@ -1,0 +1,14 @@
+graph LR
+    C["Claude Code"] --> MCP["MCP Protocol<br/>(stdio transport)"]
+
+    MCP --> NP["nexus-platform<br/>(custom — built here)"]
+    MCP --> GH["@mcp/server-github<br/>(official)"]
+    MCP --> PG["@mcp/server-postgres<br/>(official)"]
+
+    NP --> T1["list_services<br/>get_service_status"]
+    NP --> T2["create_deployment<br/>set_feature_flag"]
+    NP --> T3["create_incident<br/>resolve_incident"]
+    NP --> R1["nexus://runbooks/*<br/>(MCP Resources)"]
+
+    GH --> T4["PRs · Issues<br/>Code review comments"]
+    PG --> T5["Workflow state DB<br/>Query audit logs"]

@@ -21,6 +21,21 @@ Infrastructure: Kubernetes on AWS EKS, Postgres RDS, Redis, SQS.
 
 ---
 
+## Feature Delivery Workflow
+
+When given a new feature request, **always follow this agent workflow in order**. Do not skip straight to coding.
+
+1. **Use the `planner` subagent** — decompose the requirement, identify affected services, generate acceptance criteria, produce a delivery plan at `docs/delivery-plans/`
+2. **Use the `architect` subagent** — check architecture principles, invoke the `write-adr` skill for any cross-service decision, invoke `design-sequence-diagram` skill for new multi-service flows
+3. **Use the `backend-engineer` subagent** — implement the code, applying all conventions from memory
+4. **Use the `test-engineer` subagent** — write unit, integration, and contract tests; invoke `create-contract-tests` skill if a service boundary changed
+5. **Use the `security-reviewer` subagent** — always if payment-service is involved; invoke `payments-risk-review` skill
+6. **Use the `release-manager` subagent** — invoke `prepare-release-notes` skill, produce rollout plan, register deployment via nexus-platform MCP
+
+Each agent must complete and hand off before the next begins. Announce which agent is active at the start of each step.
+
+---
+
 ## Architecture Principles
 
 1. **Services communicate via typed events over SQS, never direct HTTP calls** between backend services. HTTP is only for client-facing APIs.

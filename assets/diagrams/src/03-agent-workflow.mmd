@@ -1,0 +1,18 @@
+flowchart LR
+    REQ(["Feature Request"]) --> P
+
+    P["🗂️ Planner<br/>Delivery plan<br/>Acceptance criteria"]
+    A["🏛️ Architect<br/>ADR · Sequence diagram<br/>Contract analysis"]
+    B["⚙️ Backend Engineer<br/>Code · Conventions<br/>from memory"]
+    T["🧪 Test Engineer<br/>Unit · Integration<br/>Contract tests"]
+    S["🔒 Security Reviewer<br/>OWASP · PCI-DSS<br/>Payments risk"]
+    R["🚀 Release Manager<br/>Release notes<br/>Rollout plan"]
+
+    P --> A --> B --> T --> S --> R --> DONE(["Deployed Feature"])
+
+    P -. "docs/delivery-plans/" .-> ARTS
+    A -. "docs/adrs/" .-> ARTS
+    T -. "tests/" .-> ARTS
+    S -. "docs/reviews/" .-> ARTS
+    R -. "docs/releases/" .-> ARTS
+    ARTS[["📄 Artifacts"]]
