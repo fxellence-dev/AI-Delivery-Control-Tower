@@ -4,6 +4,8 @@
 
 Not a toy demo. A working engineering copilot for a fictional B2B SaaS company (Nexus Platform) that teams would genuinely use.
 
+> **Read the full write-up**: [Your Team is Using Claude Wrong — Here's How to Fix It](https://medium.com/@amitmahajan.cloud/your-team-is-using-claude-wrong-heres-how-to-fix-it-c77b89ba3195)
+
 ---
 
 ## What This Is
